@@ -8,14 +8,11 @@ const createApi = (bot) => {
     app.use(bodyParser.json())
 
     app.post('/send-message', async (req, res) => {
-        const chatId = req.body.chatId
-        const message = req.body.message
-
         try {
-            await bot.sendMessage(chatId, message)
-            return res.status(200).send()
+            await bot.sendMessage(req.body.chatId, req.body.message)
+            res.status(200).send()
         } catch (error) {
-            return res.status(500).send()
+            res.status(500).send()
         }
     })
 
