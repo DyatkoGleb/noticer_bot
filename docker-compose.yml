@@ -1,0 +1,15 @@
+version: '3.9'
+
+services:
+  nodejs:
+    container_name: nb_nodejs
+    build:
+      context: .
+    networks:
+      - noticer
+    volumes:
+      - .:/usr/src/app
+
+networks:
+  noticer:
+    external: true
