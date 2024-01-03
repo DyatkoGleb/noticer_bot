@@ -6,10 +6,12 @@ services:
     restart: always
     build:
       context: .
-    networks:
-      - noticer
+    ports:
+      - "3001:3000"
     volumes:
       - .:/usr/src/app
+    networks:
+      - noticer
 
 networks:
   noticer:
