@@ -5,6 +5,8 @@ const noticerApiUrl = process.env.NOTICER_API_URL
 const getMyCommands = () => {
     return [
         { command: '/notes', description: 'Получить все заметки' },
+        { command: '/notices', description: 'Получить все напоминалки' },
+        { command: '/todos', description: `Получить все todo'шки` },
         { command: '/menu', description: 'Меню' },
     ]
 }
@@ -20,6 +22,38 @@ const makeNotes = (notes) => {
     return label + notesMessage
 }
 
+function escapeMarkdown(text) {
+    return text.replace(/[_*[\]()~`>#+-=|{}.!]/g, "\\$&");
+}
+
+const makeNotices = (notices) => {
+    const label = '*Напоминалки*\n\n'
+    let noticesMessage = '';
+
+    for (let notice of notices) {
+        noticesMessage += '>' + escapeMarkdown(notice.datetime) + '\n' + notice.text + '\n\n'
+    }
+
+    return label + noticesMessage
+}
+
+const makeTodos = (todos) => {
+    const label = `*Todo's*\n\n`
+    let notesMessage = '';
+
+    for (let todo of todos) {
+        if (todo.is_completed) {
+            notesMessage += '✔️ '
+        } else {
+            notesMessage += '✖️ '
+        }
+
+        notesMessage += todo.text + '\n\n'
+    }
+
+    return label + notesMessage
+}
+
 const getNotes = async () => {
     const notes = await axios.get(`${noticerApiUrl}/getNotes`)
         .then(response => response.data.data)
@@ -28,15 +62,38 @@ const getNotes = async () => {
     return makeNotes(notes)
 }
 
+const getNotices = async () => {
+    const notices = await axios.get(`${noticerApiUrl}/getAllNotices`)
+        .then(response => response.data.data)
+        .catch(err => err.message)
+
+    return makeNotices(notices)
+}
+
+const getTodos = async () => {
+    const todos = await axios.get(`${noticerApiUrl}/getTodos`)
+        .then(response => response.data.data)
+        .catch(err => err.message)
+
+    return makeTodos(todos)
+}
+
 const showNotes = async (bot, chatId) => {
-    return bot.sendMessage(chatId, await getNotes())
+    return bot.sendMessage(chatId, await getNotes(), {parse_mode: "MarkdownV2"})
+}
+const showNotices = async (bot, chatId) => {
+    await getNotices()
+    return bot.sendMessage(chatId, await getNotices(), {parse_mode: "MarkdownV2"})
+}
+const showTodos = async (bot, chatId) => {
+    return bot.sendMessage(chatId, await getTodos(), {parse_mode: "MarkdownV2"})
 }
 
 const showKeyboard = async (bot, chatId) => {
     bot.sendMessage(chatId, `Меню бота`, {
         reply_markup: {
             keyboard: [
-                ['Get notes'],
+                ['Get notes', 'Get notices', 'Get todos'],
                 ['Close'],
             ],
             resize_keyboard: true
@@ -65,6 +122,12 @@ const messageHandler = (msg, bot) => {
         case '/notes':
         case 'Get notes':
             return showNotes(bot, chatId)
+        case '/notices':
+        case 'Get notices':
+            return showNotices(bot, chatId)
+        case '/todos':
+        case 'Get todos':
+            return showTodos(bot, chatId)
         case '/start':
         case '/menu':
             return showKeyboard(bot, chatId)
