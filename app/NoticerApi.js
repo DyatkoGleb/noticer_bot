@@ -1,5 +1,6 @@
 const axios = require('axios')
 
+
 class NoticerApi
 {
     constructor(apiUrl) {
@@ -23,5 +24,6 @@ class NoticerApi
         }
     }
 }
+
 
 module.exports = new NoticerApi(process.env.NOTICER_API_URL)

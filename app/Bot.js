@@ -1,6 +1,6 @@
 const TelegramBotApi = require('node-telegram-bot-api')
 const NoticerApi = require('./NoticerApi')
-const MessageBuilder = require("./MessageBuilder");
+const MessageBuilder = require('./MessageBuilder')
 
 
 class Bot {
@@ -13,9 +13,9 @@ class Bot {
 
     getMyCommands = () => {
         return [
-            { command: '/notes', description: 'Get all notes' },
-            { command: '/notices', description: 'Get all notices' },
-            { command: '/todos', description: `Get all todos` },
+            { command: '/notes', description: 'Show notes' },
+            { command: '/notices', description: 'Show notices' },
+            { command: '/todos', description: `Show todos` },
             { command: '/menu', description: 'Menu' },
         ]
     }
@@ -30,14 +30,17 @@ class Bot {
     handleCommand = async (chatId, command) => {
         switch (command) {
             case '/notes':
-            case 'Get notes':
+            case 'Notes':
                 return this.sendNotes(chatId)
             case '/notices':
-            case 'Get notices':
+            case 'Notices':
                 return this.sendNotices(chatId)
             case '/todos':
-            case 'Get todos':
+            case 'Todos':
                 return this.sendTodos(chatId)
+            case '/allNotices':
+            case 'All notices':
+                return this.sendAllNotices(chatId)
             case '/start':
             case '/menu':
                 return this.showKeyboard(chatId)
@@ -56,6 +59,10 @@ class Bot {
         return this.bot.sendMessage(chatId, await this.getNoticesMessage(), {parse_mode: 'MarkdownV2'})
     }
 
+    sendAllNotices = async (chatId) => {
+        return this.bot.sendMessage(chatId, await this.getAllNoticesMessage(), {parse_mode: 'MarkdownV2'})
+    }
+
     sendTodos = async (chatId) => {
         return this.bot.sendMessage(chatId, await this.getTodosMessage(), {parse_mode: 'MarkdownV2'})
     }
@@ -65,7 +72,11 @@ class Bot {
     }
 
     getNoticesMessage = async () => {
-        return MessageBuilder.build('notices', await NoticerApi.get('getAllNotices'))
+        return MessageBuilder.build('notices', await NoticerApi.get('getCurrentNotices'))
+    }
+
+    getAllNoticesMessage = async () => {
+        return MessageBuilder.build('allNotices', await NoticerApi.get('getAllNotices'))
     }
 
     getTodosMessage = async () => {
@@ -81,7 +92,8 @@ class Bot {
         this.bot.sendMessage(chatId, `Bot menu`, {
             reply_markup: {
                 keyboard: [
-                    ['Get notes', 'Get notices', 'Get todos'],
+                    ['Notes', 'Notices', 'Todos'],
+                    ['All notices'],
                     ['Close'],
                 ],
                 resize_keyboard: true

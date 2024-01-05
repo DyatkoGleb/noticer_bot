@@ -1,5 +1,6 @@
 const Utils = require('./Utils')
 
+
 class MessageBuilder
 {
     build = (type, data) => {
@@ -8,11 +9,13 @@ class MessageBuilder
                 return this.buildNotesMessage(data)
             case 'notices':
                 return this.buildNoticesMessage(data)
+            case 'allNotices':
+                return this.buildNoticesMessage(data, true)
             case 'todos':
                 return this.buildTodosMessage(data)
             case 'notice':
                 return this.buildNoticeMessage(data)
-            default :
+            default:
                 console.log('Error: invalid message type')
         }
     }
@@ -33,12 +36,12 @@ class MessageBuilder
         return label + notesMessage
     }
 
-    buildNoticesMessage = (notices) => {
+    buildNoticesMessage = (notices, all) => {
         if (!notices.length) {
             return '*🤷🏻‍♂️ There are no notices 🤷🏻‍♂️*'
         }
 
-        const label = '*Notices*\n\n'
+        const label = all ? '*All notices*\n\n' : '*Notices*\n\n'
         let noticesMessage = ''
 
         for (let notice of notices) {
