@@ -1,6 +1,7 @@
 const express = require('express')
 const bodyParser = require('body-parser')
-const Utils = require('./Utils')
+const MessageBuilder = require('./MessageBuilder')
+
 
 class BotApi
 {
@@ -24,8 +25,13 @@ class BotApi
 
     setRoutes = () => {
         this.app.post('/sendMessage', async (req, res) => {
+
             try {
-                await this.bot.sendMessage(req.body.chatId, '*Напоминание*\n' + Utils.escapeMarkdown(req.body.message), {parse_mode: "MarkdownV2"})
+                await this.bot.sendMessage(
+                    req.body.chatId,
+                    MessageBuilder.build('notice', req.body.data),
+                    { parse_mode: "MarkdownV2" }
+                )
                 res.status(200).send()
             } catch (error) {
                 res.status(500).send()

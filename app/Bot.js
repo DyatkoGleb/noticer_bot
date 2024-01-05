@@ -1,6 +1,6 @@
 const TelegramBotApi = require('node-telegram-bot-api')
 const NoticerApi = require('./NoticerApi')
-const Utils = require('./Utils')
+const MessageBuilder = require("./MessageBuilder");
 
 
 class Bot {
@@ -61,61 +61,15 @@ class Bot {
     }
 
     getNotesMessage = async () => {
-        return this.makeNotes(await NoticerApi.get('getNotes'))
+        return MessageBuilder.build('notes', await NoticerApi.get('getNotes'))
     }
 
     getNoticesMessage = async () => {
-        return this.makeNotices(await NoticerApi.get('getAllNotices'))
+        return MessageBuilder.build('notices', await NoticerApi.get('getAllNotices'))
     }
 
     getTodosMessage = async () => {
-        return this.makeTodos(await NoticerApi.get('getTodos'))
-    }
-
-    makeNotes = (notes) => {
-        if (!notes.length) {
-            return '* 🤷🏻‍♂️There are no notes 🤷🏻‍♂️*'
-        }
-
-        const label = '*Notes*\n\n'
-        let notesMessage = ''
-
-        for (let i = 0; i < notes.length; i++) {
-            let num = i + 1
-            notesMessage += `*${num}\\.* ${Utils.escapeMarkdown(notes[i].text)}\n\n`
-        }
-
-        return label + notesMessage
-    }
-
-    makeNotices = (notices) => {
-        if (!notices.length) {
-            return '*🤷🏻‍♂️ There are no notices 🤷🏻‍♂️*'
-        }
-
-        const label = '*Notices*\n\n'
-        let noticesMessage = ''
-
-        for (let notice of notices) {
-            noticesMessage += `>${Utils.escapeMarkdown(notice.datetime + '\n' + notice.text)}\n\n`
-        }
-
-        return label + noticesMessage
-    }
-
-    makeTodos = (todos) => {
-        if (!todos.length) {
-            return '*🤷🏻‍♂️ There are no todos 🤷🏻‍♂️*'
-        }
-
-        const label = `*Todos*\n\n`
-        let todosMessage = ''
-
-        for (let todo of todos) {
-            todosMessage += `${todo.is_completed ? '✔️ ' : '✖️ '} ${Utils.escapeMarkdown(todo.text)} \n\n`
-        }
-
-        return label + todosMessage
+        return MessageBuilder.build('todos', await NoticerApi.get('getTodos'))
     }
 
     addNewNote = (chatId, message) => {
