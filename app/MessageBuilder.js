@@ -1,8 +1,9 @@
-const Utils = require('./Utils')
-
-
-class MessageBuilder
+module.exports = class MessageBuilder
 {
+    constructor(utils) {
+        this.utils = utils
+    }
+
     build = (type, data) => {
         switch (type) {
             case 'notes':
@@ -30,7 +31,7 @@ class MessageBuilder
 
         for (let i = 0; i < notes.length; i++) {
             let num = i + 1
-            notesMessage += `*${num}\\.* ${Utils.escapeMarkdown(notes[i].text)}\n\n`
+            notesMessage += `*${num}\\.* ${this.utils.escapeMarkdown(notes[i].text)}\n\n`
         }
 
         return label + notesMessage
@@ -45,7 +46,7 @@ class MessageBuilder
         let noticesMessage = ''
 
         for (let notice of notices) {
-            noticesMessage += `>${Utils.escapeMarkdown(notice.datetime + '\n' + notice.text)}\n\n`
+            noticesMessage += `>${this.utils.escapeMarkdown(notice.datetime + '\n' + notice.text)}\n\n`
         }
 
         return label + noticesMessage
@@ -60,7 +61,7 @@ class MessageBuilder
         let todosMessage = ''
 
         for (let todo of todos) {
-            todosMessage += `${todo.is_completed ? '✔️ ' : '✖️ '} ${Utils.escapeMarkdown(todo.text)} \n\n`
+            todosMessage += `${todo.is_completed ? '✔️ ' : '✖️ '} ${this.utils.escapeMarkdown(todo.text)} \n\n`
         }
 
         return label + todosMessage
@@ -71,9 +72,6 @@ class MessageBuilder
             notice = JSON.parse(notice)
         }
 
-        return `*Notice*\n>${Utils.escapeMarkdown(notice.datetime)}\n\n${Utils.escapeMarkdown(notice.text)}`
+        return `*Notice*\n>${this.utils.escapeMarkdown(notice.datetime)}\n\n${this.utils.escapeMarkdown(notice.text)}`
     }
 }
-
-
-module.exports = new MessageBuilder()

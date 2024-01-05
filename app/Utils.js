@@ -1,7 +1,4 @@
-class Utils
+module.exports = class Utils
 {
     escapeMarkdown = text => text.replace(/[_*[\]()~`>#+-=|{}.!]/g, "\\$&")
 }
-
-
-module.exports = new Utils()

@@ -1,11 +1,8 @@
-const TelegramBotApi = require('node-telegram-bot-api')
-const NoticerApi = require('./NoticerApi')
-const MessageBuilder = require('./MessageBuilder')
-
-
-class Bot {
-    constructor() {
-        this.bot = new TelegramBotApi(process.env.TG_BOT_TOKEN, { polling: true })
+module.exports =  class Bot {
+    constructor(bot, noticerApi, messageBuilder) {
+        this.bot = bot
+        this.noticerApi = noticerApi
+        this.messageBuilder = messageBuilder
 
         this.bot.setMyCommands(this.getMyCommands())
         this.bot.on('message', msg => this.messageHandler(msg))
@@ -15,7 +12,7 @@ class Bot {
         return [
             { command: '/notes', description: 'Show notes' },
             { command: '/notices', description: 'Show notices' },
-            { command: '/todos', description: `Show todos` },
+            { command: '/todos', description: 'Show todos' },
             { command: '/menu', description: 'Menu' },
         ]
     }
@@ -68,28 +65,28 @@ class Bot {
     }
 
     getNotesMessage = async () => {
-        return MessageBuilder.build('notes', await NoticerApi.get('getNotes'))
+        return this.messageBuilder.build('notes', await this.noticerApi.get('getNotes'))
     }
 
     getNoticesMessage = async () => {
-        return MessageBuilder.build('notices', await NoticerApi.get('getCurrentNotices'))
+        return this.messageBuilder.build('notices', await this.noticerApi.get('getCurrentNotices'))
     }
 
     getAllNoticesMessage = async () => {
-        return MessageBuilder.build('allNotices', await NoticerApi.get('getAllNotices'))
+        return this.messageBuilder.build('allNotices', await this.noticerApi.get('getAllNotices'))
     }
 
     getTodosMessage = async () => {
-        return MessageBuilder.build('todos', await NoticerApi.get('getTodos'))
+        return this.messageBuilder.build('todos', await this.noticerApi.get('getTodos'))
     }
 
     addNewNote = (chatId, message) => {
-        NoticerApi.post('addNewNote', { message })
+        this.noticerApi.post('addNewNote', { message })
             .catch(async err => await this.bot.sendMessage(chatId, err))
     }
 
     showKeyboard = async (chatId) => {
-        this.bot.sendMessage(chatId, `Bot menu`, {
+        this.bot.sendMessage(chatId, 'Bot menu', {
             reply_markup: {
                 keyboard: [
                     ['Notes', 'Notices', 'Todos'],
@@ -109,6 +106,3 @@ class Bot {
         })
     }
 }
-
-
-module.exports = new Bot()

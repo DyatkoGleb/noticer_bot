@@ -1,12 +1,12 @@
 const express = require('express')
 const bodyParser = require('body-parser')
-const MessageBuilder = require('./MessageBuilder')
 
 
-class BotApi
+module.exports = class BotApi
 {
-    constructor(bot) {
+    constructor(bot, messageBuilder) {
         this.bot = bot
+        this.messageBuilder = messageBuilder
         this.app = express()
 
         this.app.use(bodyParser.json())
@@ -25,12 +25,11 @@ class BotApi
 
     setRoutes = () => {
         this.app.post('/sendMessage', async (req, res) => {
-
             try {
                 await this.bot.sendMessage(
                     req.body.chatId,
-                    MessageBuilder.build('notice', req.body.data),
-                    { parse_mode: "MarkdownV2" }
+                    this.messageBuilder.build('notice', req.body.data),
+                    { parse_mode: 'MarkdownV2' }
                 )
                 res.status(200).send()
             } catch (error) {
@@ -39,5 +38,3 @@ class BotApi
         })
     }
 }
-
-module.exports = BotApi
