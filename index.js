@@ -1,5 +1,6 @@
 require('dotenv').config()
 const Bot = require('./app/Bot')
-const createApi = require('./app/api')
+const BotApi = require('./app/BotApi')
 
-createApi(Bot.bot)
+
+new BotApi(Bot.bot)
