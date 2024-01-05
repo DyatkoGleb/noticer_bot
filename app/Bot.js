@@ -31,7 +31,7 @@ class Bot {
         switch (command) {
             case '/notes':
             case 'Get notes':
-                return this.showNotes(chatId)
+                return this.sendNotes(chatId)
             case '/notices':
             case 'Get notices':
                 return this.sendNotices(chatId)
@@ -48,7 +48,7 @@ class Bot {
         }
     }
 
-    showNotes = async (chatId) => {
+    sendNotes = async (chatId) => {
         return this.bot.sendMessage(chatId, await this.getNotesMessage(), {parse_mode: 'MarkdownV2'})
     }
 
@@ -97,7 +97,7 @@ class Bot {
         let noticesMessage = ''
 
         for (let notice of notices) {
-            noticesMessage += `>${Utils.escapeMarkdown(notice.datetime)}\n${notice.text}\n\n`
+            noticesMessage += `>${Utils.escapeMarkdown(notice.datetime + '\n' + notice.text)}\n\n`
         }
 
         return label + noticesMessage
