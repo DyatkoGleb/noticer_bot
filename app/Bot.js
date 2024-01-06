@@ -26,7 +26,7 @@ module.exports =  class Bot {
         this.chatId = chat.id
 
         if (from.username !== this.allowedUserName) {
-            return this.bot.sendMessage(this.chatId, 'You\'re not welcome here.')
+            return this.sendMessage('You\'re not welcome here.')
         }
 
         if (this.appStateManager.getInProgressRemoving()) {
@@ -38,20 +38,20 @@ module.exports =  class Bot {
 
     handleRemoving = async (command) => {
         if (Number(command) % 1) {
-            this.bot.sendMessage(this.chatId, 'Error: incorrect number entered', { parse_mode: 'MarkdownV2' })
+            this.sendMessage('Error: incorrect number entered')
         } else {
             const entityId = this.appStateManager.getMapEntitiesNumberToId()[command]
 
             if (!entityId) {
-                return this.bot.sendMessage(this.chatId, 'Error: incorrect number entered', { parse_mode: 'MarkdownV2' })
+                return this.sendMessage('Error: incorrect number entered')
             }
 
             this.noticerApi.post('delete' + this.appStateManager.getEntityTypeInProgressRemoving(), {'id': entityId})
                 .then(() => {
-                    this.bot.sendMessage(this.chatId, 'Success', { parse_mode: 'MarkdownV2' })
+                    this.sendMessage('Success')
                     this.appStateManager.reset()
                 })
-                .catch(async err => await this.bot.sendMessage(this.chatId, err))
+                .catch(async err => await this.sendMessage(err))
         }
     }
 
@@ -82,15 +82,15 @@ module.exports =  class Bot {
     }
 
     sendNotes = async () => {
-        return this.bot.sendMessage(this.chatId, await this.getNotesMessage(), { parse_mode: 'MarkdownV2' })
+        return this.sendMessageMd(await this.getNotesMessage())
     }
 
     sendNotices = async () => {
-        return this.bot.sendMessage(this.chatId, await this.getNoticesMessage(), { parse_mode: 'MarkdownV2' })
+        return this.sendMessageMd(await this.getNoticesMessage())
     }
 
     sendAllNotices = async () => {
-        return this.bot.sendMessage(this.chatId, await this.getAllNoticesMessage(), { parse_mode: 'MarkdownV2' })
+        return this.sendMessageMd(await this.getAllNoticesMessage())
     }
 
     removeEntity = async (entityType) => {
@@ -108,17 +108,17 @@ module.exports =  class Bot {
 
         if (!notes.length) {
             this.appStateManager.reset()
-            return this.bot.sendMessage(this.chatId, '*🤷🏻‍♂️ There are no notes 🤷🏻‍♂️*', { parse_mode: 'MarkdownV2' })
+            return this.sendMessageMd('*🤷🏻‍♂️ There are no notes 🤷🏻‍♂️*')
         }
 
         this.appStateManager.setMapEntitiesNumberToId(notes.map(item => item.id))
         const messageWithNumberedNotes = this.messageBuilder.build('notes', notes)
 
-        return this.bot.sendMessage(this.chatId, messageWithNumberedNotes, { parse_mode: 'MarkdownV2' })
+        return this.sendMessageMd(messageWithNumberedNotes)
     }
 
     sendTodos = async () => {
-        return this.bot.sendMessage(this.chatId, await this.getTodosMessage(), { parse_mode: 'MarkdownV2' })
+        return this.sendMessageMd(await this.getTodosMessage())
     }
 
     getNotesMessage = async () => {
@@ -139,11 +139,11 @@ module.exports =  class Bot {
 
     addNewNote = (message) => {
         this.noticerApi.post('addNewNote', { message })
-            .catch(async err => await this.bot.sendMessage(this.chatId, err))
+            .catch(async err => await this.sendMessage(err))
     }
 
     showKeyboard = async () => {
-        this.bot.sendMessage(this.chatId, 'Bot menu', {
+        this.sendMessage('Bot menu', {
             reply_markup: {
                 keyboard: [
                     ['Notes', 'Notices', 'Todos'],
@@ -157,10 +157,18 @@ module.exports =  class Bot {
     }
 
     closeKeyboard = async () => {
-        this.bot.sendMessage(this.chatId, 'Menu is closed', {
+        this.sendMessage('Menu is closed', {
             reply_markup: {
                 remove_keyboard: true
             }
         })
+    }
+
+    sendMessage = (text, options) => {
+        return this.bot.sendMessage(this.chatId, text, options)
+    }
+
+    sendMessageMd = (text) => {
+        return this.bot.sendMessage(this.chatId, text, { parse_mode: 'MarkdownV2' })
     }
 }
