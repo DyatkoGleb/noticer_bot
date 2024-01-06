@@ -13,7 +13,8 @@ const bot = new Bot(
     new TelegramBotApi(process.env.TG_BOT_TOKEN, { polling: true }),
     new NoticerApi(process.env.NOTICER_API_URL),
     new AppStateManager,
-    messageBuilder
+    messageBuilder,
+    process.env.TG_USERNAME
 )
 
 new BotApi(bot.bot, messageBuilder)

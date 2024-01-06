@@ -1,6 +1,6 @@
-const AppStateManager = require("./AppStateManager");
 module.exports =  class Bot {
-    constructor(bot, noticerApi, appStateManager, messageBuilder) {
+    constructor(bot, noticerApi, appStateManager, messageBuilder, allowedUserName) {
+        this.allowedUserName = allowedUserName
         this.appStateManager = appStateManager
         this.messageBuilder = messageBuilder
         this.noticerApi = noticerApi
@@ -22,8 +22,12 @@ module.exports =  class Bot {
     }
 
     messageHandler = (msg) => {
-        const { text, chat } = msg
+        const { from, text, chat } = msg
         this.chatId = chat.id
+
+        if (from.username !== this.allowedUserName) {
+            return this.bot.sendMessage(this.chatId, 'You\'re not welcome here.')
+        }
 
         if (this.appStateManager.getInProgressRemoving()) {
             return this.handleRemoving(text)
