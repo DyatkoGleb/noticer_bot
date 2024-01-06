@@ -46,7 +46,7 @@ module.exports = class MessageBuilder
         let noticesMessage = ''
 
         for (let notice of notices) {
-            noticesMessage += `>${this.utils.escapeMarkdown(notice.datetime + '\n' + notice.text)}\n\n`
+            noticesMessage += `>${this.utils.dateFormat(notice.datetime)}\n${this.utils.escapeMarkdown(notice.text)}\n\n`
         }
 
         return label + noticesMessage
@@ -72,6 +72,9 @@ module.exports = class MessageBuilder
             notice = JSON.parse(notice)
         }
 
-        return `*Notice*\n>${this.utils.escapeMarkdown(notice.datetime)}\n\n${this.utils.escapeMarkdown(notice.text)}`
+        const label = '*Notice*\n\n'
+        const noticesMessage = `>${this.utils.dateFormat(notice.datetime)}\n${this.utils.escapeMarkdown(notice.text)}\n\n`
+
+        return label + noticesMessage
     }
 }
