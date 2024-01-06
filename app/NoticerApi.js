@@ -18,7 +18,8 @@ module.exports = class NoticerApi
 
     post = async (endpoint, data) => {
         try {
-            await axios.post(`${this.apiUrl}/${endpoint}`, data)
+            const response = await axios.post(`${this.apiUrl}/${endpoint}`, data)
+            return response.data.data
         } catch (error) {
             throw error.message
         }
