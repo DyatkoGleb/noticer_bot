@@ -8,13 +8,11 @@ const AppStateManager = require('./app/AppStateManager')
 const Bot = require('./app/Bot')
 
 
-const messageBuilder = new MessageBuilder(new Utils)
 const bot = new Bot(
     new TelegramBotApi(process.env.TG_BOT_TOKEN, { polling: true }),
     new NoticerApi(process.env.NOTICER_API_URL),
     new AppStateManager,
-    messageBuilder,
-    process.env.TG_USERNAME
+    process.env.CHAT_ID
 )
 
-new BotApi(bot.bot, messageBuilder)
+new BotApi(bot)

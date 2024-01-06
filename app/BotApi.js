@@ -1,12 +1,14 @@
 const express = require('express')
 const bodyParser = require('body-parser')
+const Message = require('./Message')
+const MessageEntity = require('./MessageEntity')
 
 
 module.exports = class BotApi
 {
-    constructor(bot, messageBuilder) {
+    constructor(bot) {
         this.bot = bot
-        this.messageBuilder = messageBuilder
+        this.chatId = this.bot.allowedChatId
         this.app = express()
 
         this.app.use(bodyParser.json())
@@ -26,15 +28,23 @@ module.exports = class BotApi
     setRoutes = () => {
         this.app.post('/sendMessage', async (req, res) => {
             try {
-                await this.bot.sendMessage(
-                    req.body.chatId,
-                    this.messageBuilder.build('notice', req.body.data),
-                    { parse_mode: 'MarkdownV2' }
-                )
+                await this.bot.sendMessageMd(this.getNoticesMessage(JSON.parse(req.body.data)), this.chatId)
                 res.status(200).send()
             } catch (error) {
                 res.status(500).send()
             }
         })
+    }
+
+    getNoticesMessage = (notice) => {
+        const message = new Message()
+
+        message.setLabel('Notice')
+
+        const messageEntity = new MessageEntity(notice.text)
+        messageEntity.setDate(notice.datetime)
+        message.addEntity(messageEntity)
+
+        return message.getMessageText()
     }
 }

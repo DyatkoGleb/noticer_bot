@@ -1,12 +1,13 @@
-module.exports =  class Bot {
-    constructor(bot, noticerApi, appStateManager, messageBuilder, allowedUserName) {
-        this.allowedUserName = allowedUserName
-        this.appStateManager = appStateManager
-        this.messageBuilder = messageBuilder
-        this.noticerApi = noticerApi
-        this.bot = bot
+const Message = require('./Message')
+const MessageEntity = require('./MessageEntity')
 
-        this.chatId = null
+
+module.exports =  class Bot {
+    constructor (bot, noticerApi, appStateManager, allowedChatId) {
+        this.appStateManager = appStateManager
+        this.noticerApi = noticerApi
+        this.allowedChatId = allowedChatId
+        this.bot = bot
 
         this.bot.setMyCommands(this.getMyCommands())
         this.bot.on('message', msg => this.messageHandler(msg))
@@ -22,10 +23,10 @@ module.exports =  class Bot {
     }
 
     messageHandler = (msg) => {
-        const { from, text, chat } = msg
+        const { text, chat } = msg
         this.chatId = chat.id
 
-        if (from.username !== this.allowedUserName) {
+        if (this.chatId != this.allowedChatId) {
             return this.sendMessage('You\'re not welcome here.')
         }
 
@@ -68,7 +69,7 @@ module.exports =  class Bot {
                 return this.sendTodos()
             case '/allNotices':
             case 'All notices':
-                return this.sendAllNotices()
+                return this.sendNotices(true)
             case 'Remove note':
                 return this.removeEntity('Note')
             case '/start':
@@ -85,12 +86,8 @@ module.exports =  class Bot {
         return this.sendMessageMd(await this.getNotesMessage())
     }
 
-    sendNotices = async () => {
-        return this.sendMessageMd(await this.getNoticesMessage())
-    }
-
-    sendAllNotices = async () => {
-        return this.sendMessageMd(await this.getAllNoticesMessage())
+    sendNotices = async (all) => {
+        return this.sendMessageMd(await this.getNoticesMessage(all))
     }
 
     removeEntity = async (entityType) => {
@@ -112,7 +109,7 @@ module.exports =  class Bot {
         }
 
         this.appStateManager.setMapEntitiesNumberToId(notes.map(item => item.id))
-        const messageWithNumberedNotes = this.messageBuilder.build('notes', notes)
+        const messageWithNumberedNotes = await this.getNotesMessage()
 
         return this.sendMessageMd(messageWithNumberedNotes)
     }
@@ -122,19 +119,50 @@ module.exports =  class Bot {
     }
 
     getNotesMessage = async () => {
-        return this.messageBuilder.build('notes', await this.noticerApi.get('getNotes'))
+        const notes = await this.noticerApi.get('getNotes')
+        const message = new Message()
+
+        message.setLabel('Notes')
+
+        notes.forEach((note, idx) => {
+            const messageEntity= new MessageEntity(note.text)
+            messageEntity.setSequenceNumber(idx + 1)
+            message.addEntity(messageEntity)
+        })
+
+        return message.getMessageText()
     }
 
-    getNoticesMessage = async () => {
-        return this.messageBuilder.build('notices', await this.noticerApi.get('getCurrentNotices'))
-    }
+    getNoticesMessage = async (all) => {
+        const message = new Message()
+        const notices = all
+            ? await this.noticerApi.get('getAllNotices')
+            : await this.noticerApi.get('getCurrentNotices')
 
-    getAllNoticesMessage = async () => {
-        return this.messageBuilder.build('allNotices', await this.noticerApi.get('getAllNotices'))
+        all ? message.setLabel('All notices') : message.setLabel('Notices')
+
+        notices.forEach(notice => {
+            const messageEntity = new MessageEntity(notice.text)
+            messageEntity.setDate(notice.datetime)
+            message.addEntity(messageEntity)
+        })
+
+        return message.getMessageText()
     }
 
     getTodosMessage = async () => {
-        return this.messageBuilder.build('todos', await this.noticerApi.get('getTodos'))
+        const todos = await this.noticerApi.get('getTodos')
+        const message = new Message()
+
+        message.setLabel('Todos')
+
+        todos.forEach((todo, idx) => {
+            const messageEntity= new MessageEntity(todo.text)
+            messageEntity.setIsCompleted(todo.is_completed)
+            message.addEntity(messageEntity)
+        })
+
+        return message.getMessageText()
     }
 
     addNewNote = (message) => {
@@ -168,7 +196,7 @@ module.exports =  class Bot {
         return this.bot.sendMessage(this.chatId, text, options)
     }
 
-    sendMessageMd = (text) => {
-        return this.bot.sendMessage(this.chatId, text, { parse_mode: 'MarkdownV2' })
+    sendMessageMd = (text, chatId) => {
+        return this.bot.sendMessage(chatId ?? this.chatId, text, { parse_mode: 'MarkdownV2' })
     }
 }
