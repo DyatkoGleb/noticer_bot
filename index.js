@@ -1,5 +1,4 @@
 require('dotenv').config()
-const MessageBuilder = require('./app/MessageBuilder')
 const TelegramBotApi = require('node-telegram-bot-api')
 const NoticerApi = require('./app/NoticerApi.js')
 const BotApi = require('./app/BotApi')
