@@ -85,6 +85,7 @@ module.exports =  class Bot {
             'All notices': () => this.sendNotices(true),
             'Remove note': () => this.removeEntityAction('Note'),
             'Remove notice': () => this.removeEntityAction('Notice'),
+            'Remove todo': () => this.removeEntityAction('Todo'),
             '/start': this.showKeyboard,
             '/menu': this.showKeyboard,
             'Close': this.closeKeyboard,
@@ -111,6 +112,8 @@ module.exports =  class Bot {
                 return this.sendMessageMd(await this.noteService.removeNoteAction(entityType))
             case 'Notice':
                 return this.sendMessageMd(await this.noticeService.removeNoticeAction(entityType))
+            case 'Todo':
+                return this.sendMessageMd(await this.todoService.removeTodoAction(entityType))
         }
     }
 

@@ -25,7 +25,7 @@ const bot = new Bot(
     new RemoveService(noticerApi),
     new NoticeService(noticerApi, appStateManager),
     new NoteService(noticerApi, appStateManager),
-    new TodoService(noticerApi),
+    new TodoService(noticerApi, appStateManager),
     appStateManager,
     process.env.CHAT_ID,
 )
