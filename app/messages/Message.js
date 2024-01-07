@@ -6,7 +6,7 @@ module.exports = class Message {
         this.utils = new Utils()
         this.entities = []
 
-        this.text = this.utils.escapeMarkdown(text)
+        this.text = text ? this.utils.escapeMarkdown(text) : ''
     }
 
     setLabel = (label) => {
@@ -48,6 +48,8 @@ module.exports = class Message {
 
         const label = this.getLabel() ? this.getLabel() + '\n\n' : ''
         const hint = this.getHint() ? this.getHint() + '\n\n' : ''
+
+        console.log(label + hint + this.text + entitiesText)
 
         return label + hint + this.text + entitiesText
     }
