@@ -32,6 +32,10 @@ module.exports = class AppStateManager
         return this.mapEntitiesNumberToId
     }
 
+    removeFieldFromMapEntitiesNumberToId = (number) => {
+        delete this.mapEntitiesNumberToId[number]
+    }
+
     reset() {
         this.entityInProgressRemoving = ''
         this.inProgressRemoving = false

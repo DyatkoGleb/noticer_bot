@@ -63,6 +63,13 @@ module.exports =  class Bot {
 
         try {
             await this.removeService.removeEntity(this.appStateManager.getEntityTypeInProgressRemoving(), entityId)
+            this.appStateManager.removeFieldFromMapEntitiesNumberToId(command)
+
+            if (!Object.keys(this.appStateManager.getMapEntitiesNumberToId()).length) {
+                this.sendMessage(`End of ${this.appStateManager.getEntityTypeInProgressRemoving().toLowerCase()} removing`)
+                return this.appStateManager.reset()
+            }
+
             this.sendMessage('Success')
         } catch (error) {
             this.sendMessage(error)
