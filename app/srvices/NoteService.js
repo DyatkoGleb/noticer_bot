@@ -17,6 +17,7 @@ module.exports = class NoteService
         const notes = await this.noticerApi.get('getNotes')
 
         if (!notes.length) {
+            this.appStateManager.reset()
             return '*🤷🏻‍♂️ There are no notes 🤷🏻‍♂️*'
         }
 

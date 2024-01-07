@@ -84,6 +84,7 @@ module.exports =  class Bot {
             '/allNotices': () => this.sendNotices(true),
             'All notices': () => this.sendNotices(true),
             'Remove note': () => this.removeEntityAction('Note'),
+            'Remove notice': () => this.removeEntityAction('Notice'),
             '/start': this.showKeyboard,
             '/menu': this.showKeyboard,
             'Close': this.closeKeyboard,
@@ -108,6 +109,8 @@ module.exports =  class Bot {
         switch (entityType) {
             case 'Note':
                 return this.sendMessageMd(await this.noteService.removeNoteAction(entityType))
+            case 'Notice':
+                return this.sendMessageMd(await this.noticeService.removeNoticeAction(entityType))
         }
     }
 

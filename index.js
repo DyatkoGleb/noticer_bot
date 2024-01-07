@@ -23,7 +23,7 @@ const bot = new Bot(
     new TelegramBotApi(process.env.TG_BOT_TOKEN, {polling: true}),
     new KeyboardManager(),
     new RemoveService(noticerApi),
-    new NoticeService(noticerApi),
+    new NoticeService(noticerApi, appStateManager),
     new NoteService(noticerApi, appStateManager),
     new TodoService(noticerApi),
     appStateManager,
