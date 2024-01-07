@@ -79,6 +79,11 @@ module.exports =  class Bot {
     }
 
     handleAdding = (text) => {
+        if (Number(text) === 0) {
+            this.sendMessage(`End of ${this.appStateManager.getEntityTypeInProgressAdding().toLowerCase()} adding`)
+            return this.appStateManager.reset()
+        }
+
         try {
             switch (this.appStateManager.getEntityTypeInProgressAdding()) {
                 case 'Note':
