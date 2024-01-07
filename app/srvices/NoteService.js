@@ -22,7 +22,6 @@ module.exports = class NoteService
         }
 
         this.appStateManager.setEntityTypeInProgressRemoving(entityType)
-        this.appStateManager.setInProgressRemoving(true)
         this.appStateManager.setMapEntitiesNumberToId(notes.map(item => item.id))
 
         return await this.getNotesMessage(notes, true)
@@ -48,6 +47,15 @@ module.exports = class NoteService
             messageEntity.setSequenceNumber(idx + 1)
             message.addEntity(messageEntity)
         })
+
+        return message.getMessageText()
+    }
+
+    getHintToAddNewNote = (entityType) => {
+        const message = new Message()
+        message.setTip('Just send me any message')
+
+        this.appStateManager.setEntityTypeInProgressAdding(entityType)
 
         return message.getMessageText()
     }

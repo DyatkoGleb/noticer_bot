@@ -4,6 +4,7 @@ module.exports = class KeyboardManager
         this.keyboard = [
             ['Notes', 'Notices', 'Todos'],
             ['All notices'],
+            ['Add note', 'Add notice', 'Add todo'],
             ['Remove note', 'Remove notice', 'Remove todo'],
             ['Close'],
         ]

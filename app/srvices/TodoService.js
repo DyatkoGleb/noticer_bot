@@ -9,6 +9,10 @@ module.exports = class TodoService
         this.appStateManager = appStateManager
     }
 
+    addNewTodo = async (message) => {
+        await this.noticerApi.post('addNewNote', { message, itemType: 'todo' })
+    }
+
     removeTodoAction = async (entityType) => {
         const todos = await this.noticerApi.get('getTodos')
 
@@ -18,12 +22,10 @@ module.exports = class TodoService
         }
 
         this.appStateManager.setEntityTypeInProgressRemoving(entityType)
-        this.appStateManager.setInProgressRemoving(true)
         this.appStateManager.setMapEntitiesNumberToId(todos.map(item => item.id))
 
         return await this.getTodosMessage(todos, true)
     }
-
 
     getTodosMessage = async (todos, removing) => {
         todos = todos ?? await this.noticerApi.get('getTodos')
@@ -34,8 +36,8 @@ module.exports = class TodoService
 
         const message = new Message()
 
-
         message.setLabel('Todos')
+
         if (removing) {
             message.setTip('Send me a 0 if you are done')
         }
@@ -48,6 +50,15 @@ module.exports = class TodoService
             }
             message.addEntity(messageEntity)
         })
+
+        return message.getMessageText()
+    }
+
+    getHintToAddNewTodo = (entityType) => {
+        const message = new Message()
+        message.setTip('Just send me any message')
+
+        this.appStateManager.setEntityTypeInProgressAdding(entityType)
 
         return message.getMessageText()
     }

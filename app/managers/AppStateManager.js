@@ -2,7 +2,8 @@ module.exports = class AppStateManager
 {
     constructor () {
         this.entityInProgressRemoving = ''
-        this.inProgressRemoving = false
+        this.entityInProgressAdding = ''
+        this.mapEntitiesNumberToId = null
     }
 
     setEntityTypeInProgressRemoving = (entityInProgressRemoving) => {
@@ -13,12 +14,12 @@ module.exports = class AppStateManager
         return this.entityInProgressRemoving
     }
 
-    setInProgressRemoving = (inProgressRemoving) => {
-        this.inProgressRemoving = inProgressRemoving
+    setEntityTypeInProgressAdding = (entityInProgressAdding) => {
+        this.entityInProgressAdding = entityInProgressAdding
     }
 
-    getInProgressRemoving = () => {
-        return this.inProgressRemoving
+    getEntityTypeInProgressAdding = () => {
+        return this.entityInProgressAdding
     }
 
     setMapEntitiesNumberToId = (entityIds) => {
@@ -38,7 +39,7 @@ module.exports = class AppStateManager
 
     reset() {
         this.entityInProgressRemoving = ''
-        this.inProgressRemoving = false
+        this.entityInProgressAdding = ''
         this.mapEntitiesNumberToId = null
     }
 }

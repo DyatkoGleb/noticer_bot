@@ -38,8 +38,10 @@ module.exports =  class Bot {
             return this.sendMessage('You\'re not welcome here.')
         }
 
-        if (this.appStateManager.getInProgressRemoving()) {
+        if (this.appStateManager.getEntityTypeInProgressRemoving()) {
             return this.handleRemoving(text)
+        } else if (this.appStateManager.getEntityTypeInProgressAdding()) {
+            return this.handleAdding(text)
         }
 
         return this.handleCommand(text)
@@ -76,6 +78,29 @@ module.exports =  class Bot {
         }
     }
 
+    handleAdding = (text) => {
+        try {
+            switch (this.appStateManager.getEntityTypeInProgressAdding()) {
+                case 'Note':
+                    this.noteService.addNewNote(text)
+                    break
+                case 'Notice':
+                    if (!this.noticeService.isValidMessage(text)) {
+                        return this.sendMessage('Error: incorrect message, it should be look like:\n01.19.2024 00:01 Happy Birthday')
+                    }
+                    this.noticeService.addNewNotice(text)
+                    break
+                case 'Todo':
+                    this.todoService.addNewTodo(text)
+                    break
+            }
+
+            return this.appStateManager.reset()
+        } catch (error) {
+            this.sendMessage(error)
+        }
+    }
+
     handleCommand = (command) => {
         return this.getCommandHandler(command)()
     }
@@ -90,6 +115,9 @@ module.exports =  class Bot {
             'Todos': this.sendTodos,
             '/allNotices': () => this.sendNotices(true),
             'All notices': () => this.sendNotices(true),
+            'Add note': () => this.addEntityAction('Note'),
+            'Add notice': () => this.addEntityAction('Notice'),
+            'Add todo':() => this.addEntityAction('Todo'),
             'Remove note': () => this.removeEntityAction('Note'),
             'Remove notice': () => this.removeEntityAction('Notice'),
             'Remove todo': () => this.removeEntityAction('Todo'),
@@ -111,6 +139,17 @@ module.exports =  class Bot {
 
     sendTodos = async () => {
         return this.sendMessageMd(await this.todoService.getTodosMessage())
+    }
+
+    addEntityAction = (entityType) => {
+        switch (entityType) {
+            case 'Note':
+                return this.sendMessageMd(this.noteService.getHintToAddNewNote(entityType))
+            case 'Notice':
+                return this.sendMessageMd(this.noticeService.getHintToAddNewNotice(entityType))
+            case 'Todo':
+                return this.sendMessageMd(this.todoService.getHintToAddNewTodo(entityType))
+        }
     }
 
     removeEntityAction = async (entityType) => {
