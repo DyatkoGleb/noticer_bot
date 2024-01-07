@@ -49,8 +49,6 @@ module.exports = class Message {
         const label = this.getLabel() ? this.getLabel() + '\n\n' : ''
         const hint = this.getHint() ? this.getHint() + '\n\n' : ''
 
-        console.log(label + hint + this.text + entitiesText)
-
         return label + hint + this.text + entitiesText
     }
 }
