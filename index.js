@@ -2,7 +2,6 @@ require('dotenv').config()
 const AppStateManager = require('./app/managers/AppStateManager')
 const KeyboardManager = require('./app/managers/KeyboardManager')
 const TelegramBotApi = require('node-telegram-bot-api')
-const RemoveService = require('./app/srvices/RemoveService')
 const NoticeService = require('./app/srvices/NoticeService')
 const NoteService = require('./app/srvices/NoteService')
 const TodoService = require('./app/srvices/TodoService')
@@ -22,7 +21,6 @@ const appStateManager= new AppStateManager()
 const bot = new Bot(
     new TelegramBotApi(process.env.TG_BOT_TOKEN, {polling: true}),
     new KeyboardManager(),
-    new RemoveService(noticerApi),
     new NoticeService(noticerApi, appStateManager),
     new NoteService(noticerApi, appStateManager),
     new TodoService(noticerApi, appStateManager),

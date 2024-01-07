@@ -13,7 +13,7 @@ module.exports = class NoticeService
         await this.noticerApi.post('addNewNote', { message, itemType: 'notice' })
     }
 
-    removeNoticeAction = async (entityType) => {
+    removeNoticeAction = async () => {
         const notices = await this.noticerApi.get('getAllNotices')
 
         if (!notices.length) {
@@ -21,7 +21,6 @@ module.exports = class NoticeService
             return '*🤷🏻‍♂️ There are no notices 🤷🏻‍♂️*'
         }
 
-        this.appStateManager.setEntityTypeInProgressRemoving(entityType)
         this.appStateManager.setMapEntitiesNumberToId(notices.map(item => item.id))
 
         return await this.getNoticesMessage(true, notices, true)
@@ -58,11 +57,9 @@ module.exports = class NoticeService
         return message.getMessageText()
     }
 
-    getHintToAddNewNotice = (entityType) => {
+    getHintToAddNewNotice = () => {
         const message = new Message()
         message.setHint('Just send me message like: dd.mm.yyyy hh:mm text message')
-
-        this.appStateManager.setEntityTypeInProgressAdding(entityType)
 
         return message.getMessageText()
     }
@@ -71,5 +68,9 @@ module.exports = class NoticeService
         const pattern = /^\d{2}\.\d{2}\.\d{4} \d{2}:\d{2} .+$/
 
         return pattern.test(text)
+    }
+
+    removeEntity = async (entityType, entityId) => {
+        await this.noticerApi.post(`delete${entityType}`, { id: entityId })
     }
 }

@@ -3,6 +3,7 @@ module.exports = class AppStateManager
     constructor () {
         this.entityInProgressRemoving = ''
         this.entityInProgressAdding = ''
+        this.serviceInProcessing = null
         this.mapEntitiesNumberToId = null
     }
 
@@ -20,6 +21,14 @@ module.exports = class AppStateManager
 
     getEntityTypeInProgressAdding = () => {
         return this.entityInProgressAdding
+    }
+
+    setServiceInProcessing = (serviceInProcessing) => {
+        this.serviceInProcessing = serviceInProcessing
+    }
+
+    getServiceInProcessing = () => {
+        return this.serviceInProcessing
     }
 
     setMapEntitiesNumberToId = (entityIds) => {
@@ -40,6 +49,7 @@ module.exports = class AppStateManager
     reset() {
         this.entityInProgressRemoving = ''
         this.entityInProgressAdding = ''
+        this.serviceInProcessing = null
         this.mapEntitiesNumberToId = null
     }
 }

@@ -13,7 +13,7 @@ module.exports = class TodoService
         await this.noticerApi.post('addNewNote', { message, itemType: 'todo' })
     }
 
-    removeTodoAction = async (entityType) => {
+    removeTodoAction = async () => {
         const todos = await this.noticerApi.get('getTodos')
 
         if (!todos.length) {
@@ -21,7 +21,6 @@ module.exports = class TodoService
             return '*🤷🏻‍♂️ There are no notices 🤷🏻‍♂️*'
         }
 
-        this.appStateManager.setEntityTypeInProgressRemoving(entityType)
         this.appStateManager.setMapEntitiesNumberToId(todos.map(item => item.id))
 
         return await this.getTodosMessage(todos, true)
@@ -54,12 +53,14 @@ module.exports = class TodoService
         return message.getMessageText()
     }
 
-    getHintToAddNewTodo = (entityType) => {
+    getHintToAddNewTodo = () => {
         const message = new Message()
         message.setHint('Just send me any message')
 
-        this.appStateManager.setEntityTypeInProgressAdding(entityType)
-
         return message.getMessageText()
+    }
+
+    removeEntity = async (entityType, entityId) => {
+        await this.noticerApi.post(`delete${entityType}`, { id: entityId })
     }
 }

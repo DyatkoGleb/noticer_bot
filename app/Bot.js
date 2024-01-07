@@ -1,7 +1,6 @@
 module.exports =  class Bot {
     constructor (bot,
         keyboardManager,
-        removeService,
         noticeService,
         noteService,
         todoService,
@@ -11,7 +10,6 @@ module.exports =  class Bot {
         this.keyboardManager = keyboardManager
         this.appStateManager = appStateManager
         this.allowedChatId = allowedChatId
-        this.removeService = removeService
         this.noticeService = noticeService
         this.noteService = noteService
         this.todoService = todoService
@@ -64,7 +62,7 @@ module.exports =  class Bot {
         }
 
         try {
-            await this.removeService.removeEntity(this.appStateManager.getEntityTypeInProgressRemoving(), entityId)
+            await this.appStateManager.getServiceInProcessing().removeEntity(this.appStateManager.getEntityTypeInProgressRemoving(), entityId)
             this.appStateManager.removeFieldFromMapEntitiesNumberToId(command)
 
             if (!Object.keys(this.appStateManager.getMapEntitiesNumberToId()).length) {
@@ -147,24 +145,31 @@ module.exports =  class Bot {
     }
 
     addEntityAction = (entityType) => {
+        this.appStateManager.setEntityTypeInProgressAdding(entityType)
+
         switch (entityType) {
             case 'Note':
-                return this.sendMessageMd(this.noteService.getHintToAddNewNote(entityType))
+                return this.sendMessageMd(this.noteService.getHintToAddNewNote())
             case 'Notice':
-                return this.sendMessageMd(this.noticeService.getHintToAddNewNotice(entityType))
+                return this.sendMessageMd(this.noticeService.getHintToAddNewNotice())
             case 'Todo':
-                return this.sendMessageMd(this.todoService.getHintToAddNewTodo(entityType))
+                return this.sendMessageMd(this.todoService.getHintToAddNewTodo())
         }
     }
 
     removeEntityAction = async (entityType) => {
+        this.appStateManager.setEntityTypeInProgressRemoving(entityType)
+
         switch (entityType) {
             case 'Note':
-                return this.sendMessageMd(await this.noteService.removeNoteAction(entityType))
+                this.appStateManager.setServiceInProcessing(this.noteService)
+                return this.sendMessageMd(await this.noteService.removeNoteAction())
             case 'Notice':
-                return this.sendMessageMd(await this.noticeService.removeNoticeAction(entityType))
+                this.appStateManager.setServiceInProcessing(this.noticeService)
+                return this.sendMessageMd(await this.noticeService.removeNoticeAction())
             case 'Todo':
-                return this.sendMessageMd(await this.todoService.removeTodoAction(entityType))
+                this.appStateManager.setServiceInProcessing(this.todoService)
+                return this.sendMessageMd(await this.todoService.removeTodoAction())
         }
     }
 
