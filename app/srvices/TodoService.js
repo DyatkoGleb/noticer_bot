@@ -1,32 +1,24 @@
 const Message = require('../messages/Message')
 const MessageEntity = require('../messages/MessageEntity')
+const AbstractBaseService = require('./AbstractBaseService')
 
 
-module.exports = class TodoService
+module.exports = class TodoService extends AbstractBaseService
 {
     constructor (noticerApi, appStateManager) {
-        this.noticerApi = noticerApi
+        super(noticerApi)
         this.appStateManager = appStateManager
     }
 
-    addNewTodo = async (message) => {
-        await this.noticerApi.post('addNewNote', { message, itemType: 'todo' })
+    get getActionMethod() {
+        return 'getTodos'
     }
 
-    removeTodoAction = async () => {
-        const todos = await this.noticerApi.get('getTodos')
-
-        if (!todos.length) {
-            this.appStateManager.reset()
-            return '*🤷🏻‍♂️ There are no notices 🤷🏻‍♂️*'
-        }
-
-        this.appStateManager.setMapEntitiesNumberToId(todos.map(item => item.id))
-
-        return await this.getTodosMessage(todos, true)
+    get getEntityType() {
+        return 'todo'
     }
 
-    getTodosMessage = async (todos, removing) => {
+    async getEntityMessage (todos, removing) {
         todos = todos ?? await this.noticerApi.get('getTodos')
 
         if (!todos.length) {
@@ -51,16 +43,5 @@ module.exports = class TodoService
         })
 
         return message.getMessageText()
-    }
-
-    getHintToAddNewTodo = () => {
-        const message = new Message()
-        message.setHint('Just send me any message')
-
-        return message.getMessageText()
-    }
-
-    removeEntity = async (entityType, entityId) => {
-        await this.noticerApi.post(`delete${entityType}`, { id: entityId })
     }
 }

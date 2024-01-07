@@ -1,5 +1,6 @@
 module.exports =  class Bot {
-    constructor (bot,
+    constructor (
+        bot,
         keyboardManager,
         noticeService,
         noteService,
@@ -14,6 +15,12 @@ module.exports =  class Bot {
         this.noteService = noteService
         this.todoService = todoService
         this.bot = bot
+
+        this.serviceMap = {
+            'Note': this.noteService,
+            'Notice': this.noticeService,
+            'Todo': this.todoService,
+        }
 
         this.bot.setMyCommands(this.getCommands())
         this.bot.on('message', msg => this.messageHandler(msg))
@@ -62,7 +69,7 @@ module.exports =  class Bot {
         }
 
         try {
-            await this.appStateManager.getServiceInProcessing().removeEntity(this.appStateManager.getEntityTypeInProgressRemoving(), entityId)
+            await this.appStateManager.getServiceInProcessing().remove(this.appStateManager.getEntityTypeInProgressRemoving(), entityId)
             this.appStateManager.removeFieldFromMapEntitiesNumberToId(command)
 
             if (!Object.keys(this.appStateManager.getMapEntitiesNumberToId()).length) {
@@ -83,20 +90,11 @@ module.exports =  class Bot {
         }
 
         try {
-            switch (this.appStateManager.getEntityTypeInProgressAdding()) {
-                case 'Note':
-                    this.noteService.addNewNote(text)
-                    break
-                case 'Notice':
-                    if (!this.noticeService.isValidMessage(text)) {
-                        return this.sendMessage('Error: incorrect message, it should be look like:\n01.19.2024 00:01 Happy Birthday')
-                    }
-                    this.noticeService.addNewNotice(text)
-                    break
-                case 'Todo':
-                    this.todoService.addNewTodo(text)
-                    break
+            if (this.appStateManager.getEntityTypeInProgressAdding() === 'Notice' && !this.noticeService.isValidMessage(text)) {
+                return this.sendMessage('Error: incorrect message, it should be look like:\n01.19.2024 00:01 Happy Birthday')
             }
+
+            this.todoService.addNew(text, this.appStateManager.getEntityTypeInProgressAdding().toLowerCase())
 
             return this.appStateManager.reset()
         } catch (error) {
@@ -129,48 +127,33 @@ module.exports =  class Bot {
             'Close': this.closeKeyboard,
         }
 
-        return commandHandlers[command] || (() => this.noteService.addNewNote(command))
+        return commandHandlers[command] || (() => this.noteService.addNew(command))
     }
 
     sendNotes = async () => {
-        return this.sendMessageMd(await this.noteService.getNotesMessage())
+        return this.sendMessageMd(await this.noteService.getEntityMessage())
     }
 
     sendNotices = async (all) => {
-        return this.sendMessageMd(await this.noticeService.getNoticesMessage(all))
+        return this.sendMessageMd(await this.noticeService.getEntityMessage(null, false, all))
     }
 
     sendTodos = async () => {
-        return this.sendMessageMd(await this.todoService.getTodosMessage())
+        return this.sendMessageMd(await this.todoService.getEntityMessage())
     }
 
     addEntityAction = (entityType) => {
         this.appStateManager.setEntityTypeInProgressAdding(entityType)
+        this.appStateManager.setServiceInProcessing(this.serviceMap[entityType])
 
-        switch (entityType) {
-            case 'Note':
-                return this.sendMessageMd(this.noteService.getHintToAddNewNote())
-            case 'Notice':
-                return this.sendMessageMd(this.noticeService.getHintToAddNewNotice())
-            case 'Todo':
-                return this.sendMessageMd(this.todoService.getHintToAddNewTodo())
-        }
+        return this.sendMessageMd(this.appStateManager.getServiceInProcessing().getHintToAddNew())
     }
 
     removeEntityAction = async (entityType) => {
         this.appStateManager.setEntityTypeInProgressRemoving(entityType)
+        this.appStateManager.setServiceInProcessing(this.serviceMap[entityType])
 
-        switch (entityType) {
-            case 'Note':
-                this.appStateManager.setServiceInProcessing(this.noteService)
-                return this.sendMessageMd(await this.noteService.removeNoteAction())
-            case 'Notice':
-                this.appStateManager.setServiceInProcessing(this.noticeService)
-                return this.sendMessageMd(await this.noticeService.removeNoticeAction())
-            case 'Todo':
-                this.appStateManager.setServiceInProcessing(this.todoService)
-                return this.sendMessageMd(await this.todoService.removeTodoAction())
-        }
+        return this.sendMessageMd(await this.appStateManager.getServiceInProcessing().removeAction())
     }
 
     showKeyboard = async () => {

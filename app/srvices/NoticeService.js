@@ -1,34 +1,27 @@
 const Message = require('../messages/Message')
 const MessageEntity = require('../messages/MessageEntity')
+const AbstractBaseService = require('./AbstractBaseService')
 
 
-module.exports = class NoticeService
+module.exports = class NoticeService extends AbstractBaseService
 {
     constructor (noticerApi, appStateManager) {
-        this.noticerApi = noticerApi
+        super(noticerApi)
         this.appStateManager = appStateManager
+        this.hintTextForAddNewEntity = 'Just send me message like: dd.mm.yyyy hh:mm text message'
     }
 
-    addNewNotice = async (message) => {
-        await this.noticerApi.post('addNewNote', { message, itemType: 'notice' })
+    get getActionMethod() {
+        return 'getAllNotices'
     }
 
-    removeNoticeAction = async () => {
-        const notices = await this.noticerApi.get('getAllNotices')
-
-        if (!notices.length) {
-            this.appStateManager.reset()
-            return '*🤷🏻‍♂️ There are no notices 🤷🏻‍♂️*'
-        }
-
-        this.appStateManager.setMapEntitiesNumberToId(notices.map(item => item.id))
-
-        return await this.getNoticesMessage(true, notices, true)
+    get getEntityType() {
+        return 'notice'
     }
 
-    getNoticesMessage = async (all, notices, removing) => {
+    async getEntityMessage (notices, removing, getAll) {
         if (!notices) {
-            notices = all
+            notices = getAll
                 ? await this.noticerApi.get('getAllNotices')
                 : await this.noticerApi.get('getCurrentNotices')
         }
@@ -39,7 +32,7 @@ module.exports = class NoticeService
 
         const message = new Message()
 
-        all ? message.setLabel('All notices') : message.setLabel('Notices')
+        getAll ? message.setLabel('All notices') : message.setLabel('Notices')
 
         if (removing) {
             message.setHint('Send me a 0 if you are done')
@@ -57,20 +50,9 @@ module.exports = class NoticeService
         return message.getMessageText()
     }
 
-    getHintToAddNewNotice = () => {
-        const message = new Message()
-        message.setHint('Just send me message like: dd.mm.yyyy hh:mm text message')
-
-        return message.getMessageText()
-    }
-
     isValidMessage = (text) => {
         const pattern = /^\d{2}\.\d{2}\.\d{4} \d{2}:\d{2} .+$/
 
         return pattern.test(text)
-    }
-
-    removeEntity = async (entityType, entityId) => {
-        await this.noticerApi.post(`delete${entityType}`, { id: entityId })
     }
 }

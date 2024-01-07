@@ -14,18 +14,21 @@ process.on('unhandledRejection', (reason, promise) => {
     console.error('Unhandled Rejection at:', promise, 'reason:', reason)
 })
 
+try {
+    const noticerApi = new NoticerApi(process.env.NOTICER_API_URL)
+    const appStateManager= new AppStateManager()
 
-const noticerApi = new NoticerApi(process.env.NOTICER_API_URL)
-const appStateManager= new AppStateManager()
+    const bot = new Bot(
+        new TelegramBotApi(process.env.TG_BOT_TOKEN, {polling: true}),
+        new KeyboardManager(),
+        new NoticeService(noticerApi, appStateManager),
+        new NoteService(noticerApi, appStateManager),
+        new TodoService(noticerApi, appStateManager),
+        appStateManager,
+        process.env.CHAT_ID,
+    )
 
-const bot = new Bot(
-    new TelegramBotApi(process.env.TG_BOT_TOKEN, {polling: true}),
-    new KeyboardManager(),
-    new NoticeService(noticerApi, appStateManager),
-    new NoteService(noticerApi, appStateManager),
-    new TodoService(noticerApi, appStateManager),
-    appStateManager,
-    process.env.CHAT_ID,
-)
-
-new BotApi(bot)
+    new BotApi(bot)
+} catch (error) {
+    console.log(error)
+}

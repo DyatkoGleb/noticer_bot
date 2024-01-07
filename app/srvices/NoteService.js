@@ -1,32 +1,24 @@
 const Message = require('../messages/Message')
 const MessageEntity = require('../messages/MessageEntity')
+const AbstractBaseService = require('./AbstractBaseService')
 
 
-module.exports = class NoteService
+module.exports = class NoteService extends AbstractBaseService
 {
     constructor (noticerApi, appStateManager) {
-        this.noticerApi = noticerApi
+        super(noticerApi)
         this.appStateManager = appStateManager
     }
 
-    addNewNote = async (message) => {
-        await this.noticerApi.post('addNewNote', { message })
+    get getActionMethod() {
+        return 'getNotes'
     }
 
-    removeNoteAction = async () => {
-        const notes = await this.noticerApi.get('getNotes')
-
-        if (!notes.length) {
-            this.appStateManager.reset()
-            return '*🤷🏻‍♂️ There are no notes 🤷🏻‍♂️*'
-        }
-
-        this.appStateManager.setMapEntitiesNumberToId(notes.map(item => item.id))
-
-        return await this.getNotesMessage(notes, true)
+    get getEntityType() {
+        return 'note'
     }
 
-    getNotesMessage = async (notes, removing) => {
+    async getEntityMessage (notes, removing) {
         notes = notes ?? await this.noticerApi.get('getNotes')
 
         if (!notes.length) {
@@ -48,16 +40,5 @@ module.exports = class NoteService
         })
 
         return message.getMessageText()
-    }
-
-    getHintToAddNewNote = () => {
-        const message = new Message()
-        message.setHint('Just send me any message')
-
-        return message.getMessageText()
-    }
-
-    removeEntity = async (entityType, entityId) => {
-        await this.noticerApi.post(`delete${entityType}`, { id: entityId })
     }
 }
