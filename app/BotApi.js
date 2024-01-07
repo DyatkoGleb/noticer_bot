@@ -1,12 +1,12 @@
+const MessageEntity = require('./messages/MessageEntity')
+const Message = require('./messages/Message')
 const express = require('express')
 const bodyParser = require('body-parser')
-const Message = require('./Message')
-const MessageEntity = require('./MessageEntity')
 
 
 module.exports = class BotApi
 {
-    constructor(bot) {
+    constructor (bot) {
         this.bot = bot
         this.chatId = this.bot.allowedChatId
         this.app = express()

@@ -3,7 +3,7 @@ const axios = require('axios')
 
 module.exports = class NoticerApi
 {
-    constructor(apiUrl) {
+    constructor (apiUrl) {
         this.apiUrl = apiUrl
     }
 

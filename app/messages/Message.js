@@ -1,4 +1,4 @@
-const Utils = require('./Utils')
+const Utils = require('../Utils')
 
 
 module.exports = class Message {
@@ -41,9 +41,7 @@ module.exports = class Message {
                 messageText += entity.getIsCompleted() ? '✔️ ' : '✖️ '
             }
 
-            messageText += entity.getText() + '\n\n'
-
-            return messageText
+            return messageText + entity.getText() + '\n\n'
         }, '')
 
         const label = this.getLabel() ? this.getLabel() + '\n\n' : ''

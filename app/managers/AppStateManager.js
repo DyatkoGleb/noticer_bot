@@ -1,6 +1,6 @@
 module.exports = class AppStateManager
 {
-    constructor() {
+    constructor () {
         this.entityInProgressRemoving = ''
         this.inProgressRemoving = false
     }
@@ -23,9 +23,9 @@ module.exports = class AppStateManager
 
     setMapEntitiesNumberToId = (entityIds) => {
         this.mapEntitiesNumberToId = entityIds.reduce((acc, entityId, i) => {
-            acc[i + 1] = entityId;
-            return acc;
-        }, {});
+            acc[i + 1] = entityId
+            return acc
+        }, {})
     }
 
     getMapEntitiesNumberToId = () => {
