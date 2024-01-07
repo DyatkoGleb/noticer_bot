@@ -50,6 +50,11 @@ module.exports =  class Bot {
             return this.sendMessage('Error: incorrect number entered')
         }
 
+        if (Number(command) === 0) {
+            this.sendMessage(`End of ${this.appStateManager.getEntityTypeInProgressRemoving().toLowerCase()} removing`)
+            return this.appStateManager.reset()
+        }
+
         const entityId = this.appStateManager.getMapEntitiesNumberToId()[command]
 
         if (!entityId) {
@@ -59,7 +64,6 @@ module.exports =  class Bot {
         try {
             await this.removeService.removeEntity(this.appStateManager.getEntityTypeInProgressRemoving(), entityId)
             this.sendMessage('Success')
-            this.appStateManager.reset()
         } catch (error) {
             this.sendMessage(error)
         }

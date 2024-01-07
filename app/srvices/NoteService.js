@@ -24,10 +24,10 @@ module.exports = class NoteService
         this.appStateManager.setInProgressRemoving(true)
         this.appStateManager.setMapEntitiesNumberToId(notes.map(item => item.id))
 
-        return await this.getNotesMessage()
+        return await this.getNotesMessage(notes, true)
     }
 
-    getNotesMessage = async (notes) => {
+    getNotesMessage = async (notes, removing) => {
         notes = notes ?? await this.noticerApi.get('getNotes')
 
         if (!notes.length) {
@@ -37,6 +37,10 @@ module.exports = class NoteService
         const message = new Message()
 
         message.setLabel('Notes')
+
+        if (removing) {
+            message.setTip('Send me a 0 if you are done')
+        }
 
         notes.forEach((note, idx) => {
             const messageEntity= new MessageEntity(note.text)
