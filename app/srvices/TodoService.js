@@ -39,7 +39,7 @@ module.exports = class TodoService
         message.setLabel('Todos')
 
         if (removing) {
-            message.setTip('Send me a 0 if you are done')
+            message.setHint('Send me a 0 if you are done')
         }
 
         todos.forEach((todo, idx) => {
@@ -56,7 +56,7 @@ module.exports = class TodoService
 
     getHintToAddNewTodo = (entityType) => {
         const message = new Message()
-        message.setTip('Just send me any message')
+        message.setHint('Just send me any message')
 
         this.appStateManager.setEntityTypeInProgressAdding(entityType)
 

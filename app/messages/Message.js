@@ -2,9 +2,11 @@ const Utils = require('../Utils')
 
 
 module.exports = class Message {
-    constructor () {
+    constructor (text) {
         this.utils = new Utils()
         this.entities = []
+
+        this.text = this.utils.escapeMarkdown(text)
     }
 
     setLabel = (label) => {
@@ -15,12 +17,12 @@ module.exports = class Message {
         return this.label
     }
 
-    setTip = (tip) => {
-        this.tip = '_' + this.utils.escapeMarkdown(tip) + '_'
+    setHint = (hint) => {
+        this.hint = '_' + this.utils.escapeMarkdown(hint) + '_'
     }
 
-    getTip = () => {
-        return this.tip
+    getHint = () => {
+        return this.hint
     }
 
     addEntity = (entity) => {
@@ -28,7 +30,7 @@ module.exports = class Message {
     }
 
     getMessageText = () => {
-        const text = this.entities.reduce((messageText, entity, i) => {
+        const entitiesText = this.entities.reduce((messageText, entity, i) => {
             if (entity.getDate()) {
                 messageText += '>' + entity.getDate() + '\n'
             }
@@ -45,8 +47,8 @@ module.exports = class Message {
         }, '')
 
         const label = this.getLabel() ? this.getLabel() + '\n\n' : ''
-        const tip = this.getTip() ? this.getTip() + '\n\n' : ''
+        const hint = this.getHint() ? this.getHint() + '\n\n' : ''
 
-        return label + tip + text
+        return label + hint + this.text + entitiesText
     }
 }

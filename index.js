@@ -6,7 +6,7 @@ const RemoveService = require('./app/srvices/RemoveService')
 const NoticeService = require('./app/srvices/NoticeService')
 const NoteService = require('./app/srvices/NoteService')
 const TodoService = require('./app/srvices/TodoService')
-const NoticerApi = require('./app/NoticerApi.js')
+const NoticerApi = require('./app/NoticerApi')
 const BotApi = require('./app/BotApi')
 const Bot = require('./app/Bot')
 

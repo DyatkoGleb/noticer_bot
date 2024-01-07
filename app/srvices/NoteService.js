@@ -39,7 +39,7 @@ module.exports = class NoteService
         message.setLabel('Notes')
 
         if (removing) {
-            message.setTip('Send me a 0 if you are done')
+            message.setHint('Send me a 0 if you are done')
         }
 
         notes.forEach((note, idx) => {
@@ -53,7 +53,7 @@ module.exports = class NoteService
 
     getHintToAddNewNote = (entityType) => {
         const message = new Message()
-        message.setTip('Just send me any message')
+        message.setHint('Just send me any message')
 
         this.appStateManager.setEntityTypeInProgressAdding(entityType)
 
