@@ -42,7 +42,7 @@ module.exports = class BotApi
         message.setLabel('Notice')
 
         const messageEntity = new MessageEntity(notice.text)
-        messageEntity.setDate(notice.datetime)
+        messageEntity.setDate(notice.true_datetime)
         message.addEntity(messageEntity)
 
         return message.getMessageText()

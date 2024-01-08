@@ -40,7 +40,7 @@ module.exports = class NoticeService extends AbstractBaseService
 
         notices.forEach((notice, idx) => {
             const messageEntity = new MessageEntity(notice.text)
-            messageEntity.setDate(notice.datetime)
+            messageEntity.setDate(notice.true_datetime)
             if (removing) {
                 messageEntity.setSequenceNumber(idx + 1)
             }

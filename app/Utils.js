@@ -5,7 +5,7 @@ module.exports = class Utils
     dateFormat = (date) => {
         date = new Date(date)
 
-        return date.getHours()
+        return date.getDate()
             + ' '
             + date.toLocaleString('en-EN', { month: 'short' })
             + ' '
