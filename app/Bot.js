@@ -122,7 +122,7 @@ module.exports =  class Bot {
             '/todos': this.sendTodos,
             'Todos': this.sendTodos,
             '/allNotices': () => this.sendNotices(true),
-            'All notices': () => this.sendNotices(true),
+            '<- All': () => this.sendNotices(true),
             'Add note': () => this.addEntityAction('Note'),
             '/addnote': () => this.addEntityAction('Note'),
             'Add notice': () => this.addEntityAction('Notice'),

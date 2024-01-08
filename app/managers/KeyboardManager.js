@@ -2,8 +2,7 @@ module.exports = class KeyboardManager
 {
     constructor () {
         this.keyboard = [
-            ['Notes', 'Notices', 'Todos'],
-            ['All notices'],
+            ['Notes', 'Notices', '<- All', 'Todos'],
             ['Add note', 'Add notice', 'Add todo'],
             ['Remove note', 'Remove notice', 'Remove todo'],
             ['Close'],
