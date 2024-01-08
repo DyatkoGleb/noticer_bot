@@ -28,10 +28,17 @@ module.exports =  class Bot {
 
     getCommands = () => {
         return [
+            { command: '/menu', description: 'Menu' },
             { command: '/notes', description: 'Show notes' },
             { command: '/notices', description: 'Show notices' },
             { command: '/todos', description: 'Show todos' },
-            { command: '/menu', description: 'Menu' },
+            { command: '/allnotices', description: 'Show all notices' },
+            { command: '/addnote', description: 'Add new note' },
+            { command: '/addnotice', description: 'Add new notice' },
+            { command: '/addtodo', description: 'Add new todo' },
+            { command: '/removenote', description: 'Remove note' },
+            { command: '/removenotice', description: 'Remove notice' },
+            { command: '/removetodo', description: 'Remove todo' },
         ]
     }
 
@@ -117,11 +124,17 @@ module.exports =  class Bot {
             '/allNotices': () => this.sendNotices(true),
             'All notices': () => this.sendNotices(true),
             'Add note': () => this.addEntityAction('Note'),
+            '/addnote': () => this.addEntityAction('Note'),
             'Add notice': () => this.addEntityAction('Notice'),
+            '/addnotice': () => this.addEntityAction('Notice'),
             'Add todo':() => this.addEntityAction('Todo'),
+            '/addtodo':() => this.addEntityAction('Todo'),
             'Remove note': () => this.removeEntityAction('Note'),
+            '/removenote': () => this.removeEntityAction('Note'),
             'Remove notice': () => this.removeEntityAction('Notice'),
+            '/removenotice': () => this.removeEntityAction('Notice'),
             'Remove todo': () => this.removeEntityAction('Todo'),
+            '/removetodo': () => this.removeEntityAction('Todo'),
             '/start': this.showKeyboard,
             '/menu': this.showKeyboard,
             'Close': this.closeKeyboard,
