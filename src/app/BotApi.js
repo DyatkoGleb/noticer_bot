@@ -36,6 +36,7 @@ module.exports = class BotApi
         })
     }
 
+    // todo: mb move to Notice service
     getNoticesMessage = (notice) => {
         const message = new Message()
 

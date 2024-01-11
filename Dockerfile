@@ -1,8 +1,12 @@
 FROM node:20.9
 WORKDIR /usr/src/app
 
-COPY . .
+COPY package*.json .
 
 RUN npm install
 
-CMD ["npm", "run", "dev"]
+COPY . .
+
+RUN npm run build
+
+CMD ["node", "dist/index.js"]

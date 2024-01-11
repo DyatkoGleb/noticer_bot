@@ -49,7 +49,7 @@ module.exports = class AbstractBaseService
         return await this.getEntityMessage(entities, true, true)
     }
 
-    getHintToAddNew = () => {
+     getHintToAddNew = () => {
         const message = new Message()
         message.setHint(this.hintTextForAddNewEntity)
 
